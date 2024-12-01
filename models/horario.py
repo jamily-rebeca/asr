@@ -21,14 +21,14 @@ class Horario:
         else:
             raise ValueError("determine um horário")
 
-    def get_horario_str(self):
-    #     strHorario = datetime.strftime(self.__horario, "%d/%m/%Y")
-    #     return strHorario
-        return self.__horario
-    
     def get_horario(self):
         return self.__horario
-
+    
+    def get_horario_str(self):
+        # strHorario = datetime.strftime(self.get_horario(), "%d/%m/%Y %H:%M")
+        # return strHorario
+        return self.__horario
+        
     def set_confirmado(self, confirmado):
       self.__confirmado = confirmado
 
@@ -53,23 +53,23 @@ class Horario:
     
     def to_json(self):
       dic = {}
-      dic["id"] = self.id
-      dic["data"] = self.data.strftime("%d/%m/%Y %H:%M")
-      dic["confirmado"] = self.confirmado
-      dic["id_cliente"] = self.id_cliente
-      dic["id_servico"] = self.id_servico
+      dic["id"] = self.get_idHorario()
+      dic["data"] = self.get_horario_str()
+      dic["confirmado"] = self.get_confirmado()
+      dic["id_cliente"] = self.get_idCliente()
+      dic["id_servico"] = self.get_idServico()
       return dic    
 
 class Horarios:
-  objetos = []    # atributo estático
+  objetos: list[Horario] = []    # atributo estático
 
   @classmethod
   def inserir(cls, obj):
     cls.abrir()
     m = 0
     for c in cls.objetos:
-      if c.id > m: m = c.id
-    obj.id = m + 1
+      if c.get_idHorario() > m: m = c.get_idHorario()
+    obj.set_idHorario(m + 1)
     cls.objetos.append(obj)
     cls.salvar()
 
@@ -77,22 +77,22 @@ class Horarios:
   def listar_id(cls, id):
     cls.abrir()
     for c in cls.objetos:
-      if c.id == id: return c
+      if c.get_idHorario() == id: return c
     return None  
   
   @classmethod
   def atualizar(cls, obj):
-    c = cls.listar_id(obj.id)
+    c = cls.listar_id(obj.get_idHorario())
     if c != None:
-      c.data = obj.data
-      c.confirmado = obj.confirmado
-      c.id_cliente = obj.id_cliente
-      c.id_servico = obj.id_servico
+      c.set_horario(obj.get_horario())
+      c.set_confirmado(obj.get_confirmado())
+      c.set_idCliente(obj.get_idCliente())
+      c.set_idServico(obj.get_idServico)
       cls.salvar()
 
   @classmethod
   def excluir(cls, obj):
-    c = cls.listar_id(obj.id)
+    c = cls.listar_id(obj.get_idHorario())
     if c != None:
       cls.objetos.remove(c)
       cls.salvar()
@@ -109,7 +109,7 @@ class Horarios:
        horario.append(
           {
             "id": h.get_idHorario(),
-            "data": h.get_horario_str(),
+            "data": datetime.strftime(h.get_horario_str(), "%d/%m/%Y %H:%M"),
             "confirmado": h.get_confirmado(),
             "id_cliente": h.get_idCliente(),
             "id_servico": h.get_idServico(),
@@ -117,7 +117,7 @@ class Horarios:
        )
 
     with open("horarios.json", mode="w") as arquivo:   # w - write
-      json.dump(cls.objetos, arquivo, default = Horario.to_json)
+      json.dump(horario, arquivo)
 
 
   @classmethod
@@ -127,11 +127,10 @@ class Horarios:
       with open("horarios.json", mode="r") as arquivo:   # r - read
         texto = json.load(arquivo)
         for obj in texto:   
-          c = Horario(
-             obj["id"], datetime.strptime(obj["data"], "%d/%m/%Y %H:%M"))
-          c.confirmado = obj["confirmado"]
-          c.id_cliente = obj["id_cliente"]
-          c.id_servico = obj["id_servico"]
+          c = Horario(obj["id"], obj["data"])
+          c.set_confirmado(obj["confirmado"])
+          c.set_idCliente(obj["id_cliente"])
+          c.set_idServico(obj["id_servico"])
           cls.objetos.append(c)
     except FileNotFoundError:
       pass

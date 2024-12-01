@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st # type: ignore
+import pandas as pd # type: ignore
 from views import View
 import time
 
 class ManterServicoUI:
+    @staticmethod
     def main():
         st.header("Cadastro de Serviços")
         tab1, tab2, tab3, tab4 = st.tabs(["Listar", "Inserir", "Atualizar", "Excluir"])
@@ -12,6 +13,7 @@ class ManterServicoUI:
         with tab3: ManterServicoUI.atualizar()
         with tab4: ManterServicoUI.excluir()
 
+    @staticmethod
     def listar():
         servicos = View.servico_listar()
         if len(servicos) == 0: 
@@ -23,6 +25,7 @@ class ManterServicoUI:
             df = pd.DataFrame(dic)
             st.dataframe(df)
 
+    @staticmethod
     def inserir():
         descricao = st.text_input("Informe o nome do serviço")
         valor = st.text_input("Informe o valor (R$)")
@@ -33,21 +36,23 @@ class ManterServicoUI:
             time.sleep(2)
             st.rerun()
 
+    @staticmethod
     def atualizar():
         servicos = View.servico_listar()
         if len(servicos) == 0: 
             st.write("Nenhum serviço cadastrado")
         else:
             op = st.selectbox("Atualização de serviço", servicos)
-            descricao = st.text_input("Informe o novo nome do serviço", op.descricao)
-            valor = st.text_input("Informe o novo valor (R$)", op.valor)
-            duracao = st.text_input("Informe a nova duração (minutos)", str(op.duracao))
+            descricao = st.text_input("Informe o novo nome do serviço", op.get_descricao())
+            valor = st.text_input("Informe o novo valor (R$)", op.get_valor())
+            duracao = st.text_input("Informe a nova duração (minutos)", str(op.get_duracao()))
             if st.button("Atualizar"):
-                View.servico_atualizar(op.id, descricao, float(valor), int(duracao))
+                View.servico_atualizar(op.get_idServico, descricao, float(valor), int(duracao))
                 st.success("Serviço atualizado com sucesso")
                 time.sleep(2)
                 st.rerun()
 
+    @staticmethod
     def excluir():
         servicos = View.servico_listar()
         if len(servicos) == 0: 
@@ -55,7 +60,7 @@ class ManterServicoUI:
         else:
             op = st.selectbox("Exclusão de serviço", servicos)
             if st.button("Excluir"):
-                View.servico_excluir(op.id)
+                View.servico_excluir(op.get_idServico())
                 st.success("Serviço excluído com sucesso")
                 time.sleep(2)
                 st.rerun()

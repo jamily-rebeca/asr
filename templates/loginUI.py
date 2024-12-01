@@ -1,8 +1,9 @@
-import streamlit as st
+import streamlit as st # type: ignore
 from views import View
 import time
 
 class LoginUI:
+    @staticmethod
     def main():
         st.header("Entrar no Sistema")
         email = st.text_input("Informe o e-mail")

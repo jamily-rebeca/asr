@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st # type: ignore
+import pandas as pd # type: ignore
 from views import View
 import time
 
 class ManterClienteUI:
+    @staticmethod
     def main():
         st.header("Cadastro de Clientes")
         tab1, tab2, tab3, tab4 = st.tabs(["Listar", "Inserir", "Atualizar", "Excluir"])
@@ -11,7 +12,7 @@ class ManterClienteUI:
         with tab2: ManterClienteUI.inserir()
         with tab3: ManterClienteUI.atualizar()
         with tab4: ManterClienteUI.excluir()
-
+    @staticmethod
     def listar():
         clientes = View.cliente_listar()
         if len(clientes) == 0: 
@@ -22,7 +23,7 @@ class ManterClienteUI:
             for obj in clientes: dic.append(obj.__dict__)
             df = pd.DataFrame(dic)
             st.dataframe(df)
-
+    @staticmethod
     def inserir():
         nome = st.text_input("Informe o nome do cliente")
         email = st.text_input("Informe o e-mail")
@@ -33,23 +34,23 @@ class ManterClienteUI:
             st.success("Cliente inserido com sucesso")
             time.sleep(2)
             st.rerun()
-
+    @staticmethod
     def atualizar():
         clientes = View.cliente_listar()
         if len(clientes) == 0: 
             st.write("Nenhum cliente cadastrado")
         else:
             op = st.selectbox("Atualização de cliente", clientes)
-            nome = st.text_input("Informe o novo nome do cliente", op.nome)
-            email = st.text_input("Informe o novo e-mail", op.email)
-            fone = st.text_input("Informe o novo fone", op.fone)
-            senha = st.text_input("Informe a nova senha", op.senha, type="password")
+            nome = st.text_input("Informe o novo nome do cliente", op.get_nome())
+            email = st.text_input("Informe o novo e-mail", op.get_email())
+            fone = st.text_input("Informe o novo fone", op.get_fone())
+            senha = st.text_input("Informe a nova senha", op.get_senha(), type="password")
             if st.button("Atualizar"):
-                View.cliente_atualizar(op.id, nome, email, fone, senha)
+                View.cliente_atualizar(op.get_idCliente(), nome, email, fone, senha)
                 st.success("Cliente atualizado com sucesso")
                 time.sleep(2)
                 st.rerun()
-
+    @staticmethod
     def excluir():
         clientes = View.cliente_listar()
         if len(clientes) == 0: 
@@ -57,7 +58,7 @@ class ManterClienteUI:
         else:
             op = st.selectbox("Exclusão de cliente", clientes)
             if st.button("Excluir"):
-                View.cliente_excluir(op.id)
+                View.cliente_excluir(op.get_idCliente())
                 st.success("Cliente excluído com sucesso")
                 time.sleep(2)
                 st.rerun()
